@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAREERAI-API CONTROLLER</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="bg-glow" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <a href="/" class="brand">
+            CAREER<span>AI</span><small>-API</small>
+        </a>
+
+        <div class="topbar-actions">
+            <div class="status-pill" id="topStatusPill" data-state="checking">
+                <span class="pulse-dot"></span>
+                <span id="topStatusText">Checking gateway...</span>
+            </div>
+            <button type="button" class="btn-ghost" id="refreshStatusBtn">
+                Check Health
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <div class="kicker">
+                <span class="kicker-dot"></span>
+                VERCEL SERVERLESS GATEWAY
+            </div>
+            <h1>
+                CAREERAI-API<br>
+                <span class="accent-outline">CONTROLLER</span>
+            </h1>
+            <p class="hero-subtitle" id="waitingBanner">
+                I am waiting for your request — send a <code>POST</code> payload to <code>/api/gemini</code> or test the live gateway below.
+            </p>
+        </section>
+
+        <section class="metrics-grid" aria-label="Gateway telemetry">
+            <article class="metric-card">
+                <span class="metric-label">GATEWAY STATE</span>
+                <strong class="metric-value" id="gatewayState">Checking...</strong>
+                <span class="metric-hint" id="gatewayHint">Querying GET /api/gemini</span>
+            </article>
+
+            <article class="metric-card">
+                <span class="metric-label">ACTIVE MODEL</span>
+                <strong class="metric-value" id="modelName">gemini-3.5-flash</strong>
+                <span class="metric-hint">Configured via GEMINI_MODEL</span>
+            </article>
+
+            <article class="metric-card">
+                <span class="metric-label">POST ENDPOINT</span>
+                <div class="endpoint-row">
+                    <code class="endpoint-url" id="endpointUrl">/api/gemini</code>
+                    <button type="button" class="btn-mini" id="copyEndpointBtn">Copy</button>
+                </div>
+                <span class="metric-hint">Set as VERCEL_GEMINI_API_URL in Django</span>
+            </article>
+        </section>
+
+        <section class="workspace-grid">
+            <article class="panel console-panel">
+                <div class="panel-header">
+                    <div>
+                        <span class="panel-kicker">LIVE REQUEST CONSOLE</span>
+                        <h2>Test <code>POST /api/gemini</code></h2>
+                    </div>
+                    <span class="method-badge">POST JSON</span>
+                </div>
+
+                <form id="promptForm" class="prompt-form">
+                    <label for="promptInput" class="field-label">Prompt Payload</label>
+                    <textarea
+                        id="promptInput"
+                        rows="4"
+                        placeholder="Ask CareerAI-API anything or test with 'Reply with just OK'..."
+                        required
+                    >Reply with just OK</textarea>
+
+                    <div class="presets-row">
+                        <span class="presets-label">Quick test:</span>
+                        <button type="button" class="preset-chip" data-prompt="Reply with just OK">Health Check ("OK")</button>
+                        <button type="button" class="preset-chip" data-prompt="Give a 3-step Python backend learning roadmap.">Backend Roadmap</button>
+                        <button type="button" class="preset-chip" data-prompt="List 3 essential skills for an AI Engineer.">AI Skills</button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" id="sendBtn">
+                            Send POST Request
+                        </button>
+                        <span class="latency-note" id="latencyNote">Ready — awaiting request</span>
+                    </div>
+                </form>
+
+                <div class="response-box">
+                    <div class="response-header">
+                        <span class="field-label">GATEWAY RESPONSE</span>
+                        <span class="http-badge" id="httpBadge">IDLE</span>
+                    </div>
+                    <div class="response-rendered" id="responseRendered">
+                        Waiting for your first test request...
+                    </div>
+                    <details class="raw-details">
+                        <summary>View Raw JSON Payload</summary>
+                        <pre id="responseJson">{}</pre>
+                    </details>
+                </div>
+            </article>
+
+            <aside class="side-stack">
+                <article class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <span class="panel-kicker">DJANGO SETTINGS</span>
+                            <h2>Backend Connection</h2>
+                        </div>
+                        <button type="button" class="btn-mini" id="copySnippetBtn">Copy</button>
+                    </div>
+                    <p class="panel-copy">
+                        Add this URL inside <code>project/settings.py</code> so your CareerAI chatbot routes through this controller:
+                    </p>
+                    <pre class="code-block" id="djangoSnippet">VERCEL_GEMINI_API_URL = "https://your-app.vercel.app/api/gemini"</pre>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <span class="panel-kicker">CONTROLLER LOG</span>
+                            <h2>Recent Requests</h2>
+                        </div>
+                        <button type="button" class="btn-mini" id="clearLogBtn">Clear</button>
+                    </div>
+                    <ul class="log-list" id="logList">
+                        <li class="log-empty">No requests sent in this session yet.</li>
+                    </ul>
+                </article>
+            </aside>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span>CAREERAI-API CONTROLLER</span>
+        <span>Serverless Python Runtime &bull; Standalone Vercel Deployment</span>
+    </footer>
+
+    <script src="/app.js"></script>
+</body>
+</html>
+
